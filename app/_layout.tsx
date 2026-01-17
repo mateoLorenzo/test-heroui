@@ -1,24 +1,65 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import { HeroUINativeProvider, type HeroUINativeConfig } from "heroui-native";
+import { KeyboardAvoidingView } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "../global.css";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+const config: HeroUINativeConfig = {
+  textProps: {
+    // Disable font scaling for accessibility
+    allowFontScaling: true,
+    // Auto-adjust font size to fit container
+    adjustsFontSizeToFit: false,
+    // Maximum font size multiplier when scaling
+    maxFontSizeMultiplier: 1.5,
+    // Minimum font scale (iOS only, 0.01-1.0)
+    minimumFontScale: 0.5,
+  },
+  // Disable all animations across the application (cascades to all children)
+  // animation: "disable-all",
+  devInfo: {
+    // Disable styling principles information message
+    stylingPrinciples: false,
+  },
 
-export const unstable_settings = {
-  anchor: '(tabs)',
+  toast: {
+    // Global toast configuration (used as defaults for all toasts)
+    defaultProps: {
+      variant: "default",
+      placement: "top",
+      isSwipeable: true,
+      animation: true,
+    },
+    // Insets for spacing from screen edges (added to safe area insets)
+    insets: {
+      top: 0, // Default: iOS = 0, Android = 12
+      bottom: 6, // Default: iOS = 6, Android = 12
+      left: 12, // Default: 12
+      right: 12, // Default: 12
+    },
+    // Maximum number of visible toasts before opacity starts fading
+    maxVisibleToasts: 3,
+    // Custom wrapper function to wrap the toast content
+    contentWrapper: (children) => (
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={24}
+        className="flex-1"
+      >
+        {children}
+      </KeyboardAvoidingView>
+    ),
+  },
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <HeroUINativeProvider config={config}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </Stack>
+      </HeroUINativeProvider>
+    </GestureHandlerRootView>
   );
 }
